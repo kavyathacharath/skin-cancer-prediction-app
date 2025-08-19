@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Skin Cancer Prediction</title>
+        <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&amp;display=swap" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="./css/styles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Background Video-->
+
+        <!-- <video class="bg-video" playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop"><source src="./assets/mp4/bg.mp4" type="video/mp4" /></video> -->
+        <!-- Masthead-->
+      
+        <!--add an image as background of whole with half width and height-->
+        <div class="masthead">
+            <div class="masthead-content text-white">
+                <div class="container-fluid px-4 px-lg-0">
+                    <h1 class="fst-italic lh-1 mb-4">Skin Cancer Prediction</h1>
+                    <p class="mb-5">Get predictions about chances for occurance of skin cancer with the help of deep learning.</p>
+                   <p class="mb-4 text-info">
+                        Upload an image of a suspicious skin lesion to predict the chances of having skin cancer.
+                    </p>
+                    <form id="contactForm" name="uploadForm">
+                        <!--align input and predict button on same line with same size-->
+
+
+                        <div class="row input-group-newsletter g-2 align-items-stretch">
+                                <div class="col-6 d-flex">
+                                    <label for="fileInput" class="form-label w-100 m-0">
+                                        <input type="file" name="file" id="fileInput" class="form-control d-none" />
+                                        <span id="fileInputLabel" class="btn btn-outline-secondary w-100 h-100 d-flex align-items-center justify-content-center">Upload image</span>
+                                    </label>
+                                </div>
+                                <div class="col-6 d-flex">
+                                    <button type="submit" id="submitButton" class="btn btn-primary w-100 h-100">Predict</button>
+                                </div>
+                            </div>
+                       
+                        <!-- Submit success message-->
+                        <!---->
+                        <!-- This is what your users will see when the form-->
+                        <!-- has successfully submitted-->
+                        <div id="submitSuccessMessage">
+                            <div class="text-center mb-3 mt-2">
+                                 <div class="result-container" id="resultContainer" style="display: none;">
+                                    <h2>Diagnosis Result</h2>
+                                    <p class="result-class" id="resultClass"></p>
+                                    <p class="result-confidence" id="resultConfidence"></p>
+                                </div>
+
+                               
+                            </div>
+                        </div>
+                        
+                        <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3 mt-2">Error!</div></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+       
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+       
+    </body>
+    <script>
+        document.getElementById("contactForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            submitForm();
+        });
+
+        function submitForm() {
+            var form = document.getElementById("contactForm");
+            var fileInput = document.getElementById("fileInput");
+            var resultContainer = document.getElementById("resultContainer");
+            var resultClass = document.getElementById("resultClass");
+            var resultConfidence = document.getElementById("resultConfidence");
+
+            resultContainer.style.display = "none";
+
+            var formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/predict", true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    resultClass.innerText = "Class: " + response.class;
+                    resultConfidence.innerText = "Confidence: " + response.confidence.toFixed(2);
+                    resultContainer.style.display = "block";
+                    document.getElementById("submitButton").style.display = "inline-block"; // Ensure button is visible
+                    document.getElementById("contactForm").reset()
+                } else {
+                    alert("Error: " + xhr.status);
+                }
+            };
+            xhr.send(formData);
+        }
+        
+        document.getElementById("fileInput").addEventListener("change", function() {
+            var label = document.getElementById("fileInputLabel");
+            if (this.files && this.files.length > 0) {
+                label.textContent = this.files[0].name;
+            } else {
+                label.textContent = "Upload image";
+            }
+        });
+    </script>
+</html>
